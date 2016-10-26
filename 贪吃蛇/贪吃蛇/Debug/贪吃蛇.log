@@ -1,0 +1,4 @@
+﻿  源.cpp
+c:\users\administrator\documents\visual studio 2015\projects\贪吃蛇\贪吃蛇\源.cpp(191): warning C4715: “judge”: 不是所有的控件路径都返回值
+  贪吃蛇.vcxproj -> C:\Users\Administrator\documents\visual studio 2015\Projects\贪吃蛇\Debug\贪吃蛇.exe
+  贪吃蛇.vcxproj -> C:\Users\Administrator\documents\visual studio 2015\Projects\贪吃蛇\Debug\贪吃蛇.pdb (Full PDB)
