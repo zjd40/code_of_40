@@ -13,7 +13,7 @@ int map[H][W], *food, *head, *body[H*W-1], *tail;//地图，食物，蛇头，蛇身，蛇尾
 char direction;//输入方向
 char Right, Left, Front, Back;//蛇头方向
 int bodyLength = 1;//蛇身长
-int flag = 1;//游戏结束标志
+int flag = 1;//游戏继续标志
 
 void start();//生成地图
 void getFood();//产生食物
