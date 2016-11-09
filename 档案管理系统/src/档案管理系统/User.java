@@ -1,6 +1,8 @@
 package 档案管理系统;
 
+import java.sql.SQLException;
 import java.io.IOException;
+
 
 public abstract class User {
 	private String name;
@@ -13,26 +15,32 @@ public abstract class User {
 		this.role=role;				
 	}
 	
-	public boolean changeUserInfo(String password){
+	public boolean changeUserInfo(String password) throws SQLException{
 		//写用户信息到存储
 		if (DataProcessing.update(name, password, role)){
 			this.password=password;
-			System.out.println("修改成功");
+			System.out.println("修改成功！");
 			return true;
 		}else
 			return false;
 	}
 	
-	public abstract void showMenu() throws IOException;
-	
-	public boolean downloadFile(String filename){
+	public boolean downloadFile(String filename) throws IOException{
+		double ranValue=Math.random();
+		if (ranValue>0.5)
+			throw new IOException( "Error in accessing file" );
 		System.out.println("下载文件... ...");
 		return true;
 	}
 	
-	public void showFileList(){
+	public void showFileList() throws SQLException{
+		double ranValue=Math.random();
+		if (ranValue>0.5)
+			throw new SQLException( "Error in accessing file DB" );
 		System.out.println("列表... ...");
 	}
+	
+	public abstract void showMenu() throws IOException, SQLException;
 	
 	public void exitSystem(){
 		System.out.println("系统退出, 谢谢使用 ! ");

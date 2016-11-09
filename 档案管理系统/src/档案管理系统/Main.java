@@ -1,23 +1,32 @@
 package 档案管理系统;
 import java.io.*;
+import java.sql.SQLException;
 
 public class Main {
-	static void login() throws IOException{
+	static void login() throws IOException, SQLException{
 		String name;
 		String password;
 		BufferedReader buf;
-		System.out.println("登录界面");
-		System.out.println("请输入用户名： ");
+		System.out.println("*******登录界面*******");
+		System.out.print("请输入用户名： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		name = buf.readLine();
-		System.out.println("请输入口令： ");
+		System.out.print("请输入口令： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		password = buf.readLine();
-		User user = DataProcessing.search(name, password);
-		user.showMenu();
+		try{
+			User user = DataProcessing.search(name, password);
+			if (user == null){
+				System.out.println("用户不存在！");
+			}else{
+				user.showMenu();
+			}
+		}catch(SQLException e){
+			System.out.println("数据库错误：" + e);
+		}
 	}
 	
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, SQLException{
 		String tip_system = "档案系统";
 		String tip_menu = "请选择菜单： ";
 		String tip_exit = "系统退出，谢谢使用！";
@@ -31,7 +40,7 @@ public class Main {
 		String str;
 		while(true){
 			System.out.println(infos);
-			System.out.println(tip_menu);
+			System.out.print(tip_menu);
 			buf = new BufferedReader(new InputStreamReader(System.in));
 			str = buf.readLine();
 			if(str.equals("1")){
