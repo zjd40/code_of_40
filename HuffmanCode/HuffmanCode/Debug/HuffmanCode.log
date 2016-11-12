@@ -1,0 +1,4 @@
+﻿  main.cpp
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(23): warning C4018: “<”: 有符号/无符号不匹配
+  HuffmanCode.vcxproj -> C:\Users\Administrator\documents\visual studio 2015\Projects\Huffmancode\Debug\HuffmanCode.exe
+  HuffmanCode.vcxproj -> C:\Users\Administrator\documents\visual studio 2015\Projects\Huffmancode\Debug\HuffmanCode.pdb (Full PDB)
