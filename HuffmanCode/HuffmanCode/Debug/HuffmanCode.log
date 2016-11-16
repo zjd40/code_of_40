@@ -1,4 +1,6 @@
 ﻿  main.cpp
-c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(23): warning C4018: “<”: 有符号/无符号不匹配
-  HuffmanCode.vcxproj -> C:\Users\Administrator\documents\visual studio 2015\Projects\Huffmancode\Debug\HuffmanCode.exe
-  HuffmanCode.vcxproj -> C:\Users\Administrator\documents\visual studio 2015\Projects\Huffmancode\Debug\HuffmanCode.pdb (Full PDB)
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(24): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(51): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(242): warning C4018: “<”: 有符号/无符号不匹配
+  HuffmanCode.vcxproj -> C:\Users\Administrator\Documents\Visual Studio 2015\Projects\HuffmanCode\Debug\HuffmanCode.exe
+  HuffmanCode.vcxproj -> C:\Users\Administrator\Documents\Visual Studio 2015\Projects\HuffmanCode\Debug\HuffmanCode.pdb (Full PDB)

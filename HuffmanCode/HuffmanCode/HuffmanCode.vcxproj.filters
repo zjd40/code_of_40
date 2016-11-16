@@ -18,6 +18,9 @@
     <ClInclude Include="myHuffmanCode.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="myFile.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
