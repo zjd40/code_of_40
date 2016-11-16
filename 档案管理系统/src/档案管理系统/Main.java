@@ -15,7 +15,7 @@ public class Main {
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		password = buf.readLine();
 		try{
-			User user = DataProcessing.search(name, password);
+			User user = DataProcessing.searchUser(name, password);
 			if (user == null){
 				System.out.println("用户不存在！");
 			}else{

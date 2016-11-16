@@ -29,7 +29,7 @@ public class Administrator extends User{
 			buf = new BufferedReader(new InputStreamReader(System.in));
 			role = buf.readLine();
 			try{
-				DataProcessing.update(name, password, role);
+				DataProcessing.updateUser(name, password, role);
 				System.out.println("修改成功！");
 			}
 			catch(SQLException e){
@@ -49,7 +49,7 @@ public class Administrator extends User{
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		name = buf.readLine();
 		try{
-			if (DataProcessing.delete(name)){
+			if (DataProcessing.deleteUser(name)){
 				System.out.println("删除用户成功！");
 			}
 			else{
@@ -77,7 +77,7 @@ public class Administrator extends User{
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		role = buf.readLine();
 		try{
-			if (DataProcessing.insert(name, password, role)){
+			if (DataProcessing.insertUser(name, password, role)){
 				System.out.println("新增用户成功！");
 			}
 			else{
@@ -110,7 +110,7 @@ public class Administrator extends User{
 		}
 	}
 	
-	public void downloadFile() throws IOException{
+	public void downloadFile() throws IOException, SQLException{
 		BufferedReader buf;
 		String str;
 		System.out.println("*****下载文件界面****** ");

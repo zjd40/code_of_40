@@ -11,7 +11,7 @@ public class Browser extends User{
 		super(name, password, role);
 	}
 	
-	public void downloadFile() throws IOException{
+	public void downloadFile() throws IOException, SQLException{
 		BufferedReader buf;
 		String str;
 		System.out.println("下载文件界面 ");

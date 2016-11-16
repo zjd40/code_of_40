@@ -1,9 +1,16 @@
 package 档案管理系统;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class Operator extends User{
 
@@ -11,39 +18,60 @@ public class Operator extends User{
 		super(name, password, role);
 	}
 	
-	public void uploadFile() throws IOException{
+	public void uploadFile() throws IOException, SQLException{
 		BufferedReader buf;
-		String name;
-		String num;
+		String filename;
+		String ID;
 		String description;
 		System.out.println("*****上传文件界面*****");
 		System.out.print("请输入源文件名： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
-		name = buf.readLine();
+		filename = buf.readLine();
 		System.out.print("请输入档案号： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
-		num = buf.readLine();
+		ID = buf.readLine();
 		System.out.println("请输入档案描述： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		description = buf.readLine();
-		System.out.println("上传文件.....");
-		System.out.println("上传文件成功！");
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis()); 
+		try{
+			File tempFile = new File(filename);
+			byte[] buffer = new byte[1024];
+			DataProcessing.insertDoc(ID ,this.getName(), timestamp, description, tempFile.getName());
+			BufferedInputStream infile = new BufferedInputStream(new FileInputStream(filename));
+			BufferedOutputStream targetfile = new BufferedOutputStream(new FileOutputStream(new File(uploadpath + tempFile.getName()), false));
+			
+			while(true){
+				int byteRead = infile.read(buffer);
+				if (byteRead == -1){
+					break;
+				}
+				targetfile.write(buffer, 0, byteRead);
+			}
+			infile.close();
+			targetfile.close();
+			System.out.println("上传文件.....");
+			System.out.println("上传文件成功！");
+		}
+		catch(FileNotFoundException e){
+			System.out.println("文件访问错误：" + e);
+		}
 	}
 	
-	public void downloadFile() throws IOException{
+	public void downloadFile() throws IOException, SQLException{
 		BufferedReader buf;
-		String str;
+		String ID;
 		System.out.println("*****下载文件界面***** ");
 		System.out.print("请输入档案号： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
-		str = buf.readLine();
+		ID = buf.readLine();
 		try{
-			this.downloadFile(str);
+			this.downloadFile(ID);
+			System.out.println("下载文件成功！");
 		}
 		catch(IOException e){
 			System.out.println("文件访问错误：" + e);
 		}
-		System.out.println("下载文件成功！");
 	}
 	
 	public void showFileLists(){
