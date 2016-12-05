@@ -1,6 +1,7 @@
 package 档案管理系统;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
@@ -12,6 +13,10 @@ public class Administrator extends User{
 		super(name, password, role);
 	}
 	
+	public Administrator() {
+		super(null, null ,null);
+	}
+
 	public void changeUserInfo() throws IOException, SQLException{
 		String name;
 		BufferedReader buf;
@@ -19,25 +24,29 @@ public class Administrator extends User{
 		System.out.	print("请输入用户名： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		name = buf.readLine();
-		if (DataProcessing.users.containsKey(name) && !name.equals(this.getName())){
-			String password;
-			System.out.	print("请输入新口令： ");
-			buf = new BufferedReader(new InputStreamReader(System.in));
-			password = buf.readLine();
-			String role;
-			System.out.	print("请输入新角色： ");
-			buf = new BufferedReader(new InputStreamReader(System.in));
-			role = buf.readLine();
-			try{
-				DataProcessing.updateUser(name, password, role);
-				System.out.println("修改成功！");
+		try {
+			if (DataProcessing.searchUser(name) != null && !name.equals(this.getName())){
+				String password;
+				System.out.	print("请输入新口令： ");
+				buf = new BufferedReader(new InputStreamReader(System.in));
+				password = buf.readLine();
+				String role;
+				System.out.	print("请输入新角色： ");
+				buf = new BufferedReader(new InputStreamReader(System.in));
+				role = buf.readLine();
+				try{
+					DataProcessing.updateUser(name, password, role);
+					System.out.println("修改成功！");
+				}
+				catch(SQLException e){
+					System.out.println("数据库错误：" + e);
+				}
 			}
-			catch(SQLException e){
-				System.out.println("数据库错误：" + e);
+			else{
+				System.out.println("修改失败！");
 			}
-		}
-		else{
-			System.out.println("修改失败！");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -56,7 +65,7 @@ public class Administrator extends User{
 				System.out.println("该用户不存在！");
 			}
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("数据库错误：" + e);
 		}
 	}
@@ -84,7 +93,7 @@ public class Administrator extends User{
 				System.out.println("该用户已存在！");
 			}
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("数据库错误：" + e);
 		}
 	}
@@ -105,23 +114,23 @@ public class Administrator extends User{
 				user = DataProcessing.getAllUser().nextElement();
 			}
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("数据库错误" + e);
 		}
 	}
 	
 	public void downloadFile() throws IOException, SQLException{
 		BufferedReader buf;
-		String str;
+		String ID;
 		System.out.println("*****下载文件界面****** ");
 		System.out.print("请输入档案号： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
-		str = buf.readLine();
+		ID = buf.readLine();
 		try{
-			this.downloadFile(str);
+			this.downloadFile(ID, new File(downloadpath + DataProcessing.searchDoc(ID).getFilename()));
 			System.out.println("下载成功！ ");
 		}
-		catch(IOException e){
+		catch(IOException | ClassNotFoundException e){
 			System.out.println("文件访问错误：" + e);
 		}
 	}
@@ -131,7 +140,7 @@ public class Administrator extends User{
 		try{
 			this.showFileList();
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("文件访问错误：" + e);
 		}
 	}
@@ -150,7 +159,7 @@ public class Administrator extends User{
 				this.changeUserInfo(password);
 			}
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("数据库错误：" + e);
 		}
 	}

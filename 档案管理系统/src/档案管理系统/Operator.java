@@ -1,16 +1,11 @@
 package 档案管理系统;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 public class Operator extends User{
 
@@ -18,6 +13,10 @@ public class Operator extends User{
 		super(name, password, role);
 	}
 	
+	public Operator() {
+		super(null, null, null);
+	}
+
 	public void uploadFile() throws IOException, SQLException{
 		BufferedReader buf;
 		String filename;
@@ -33,27 +32,15 @@ public class Operator extends User{
 		System.out.println("请输入档案描述： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		description = buf.readLine();
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis()); 
 		try{
-			File tempFile = new File(filename);
-			byte[] buffer = new byte[1024];
-			DataProcessing.insertDoc(ID ,this.getName(), timestamp, description, tempFile.getName());
-			BufferedInputStream infile = new BufferedInputStream(new FileInputStream(filename));
-			BufferedOutputStream targetfile = new BufferedOutputStream(new FileOutputStream(new File(uploadpath + tempFile.getName()), false));
-			
-			while(true){
-				int byteRead = infile.read(buffer);
-				if (byteRead == -1){
-					break;
-				}
-				targetfile.write(buffer, 0, byteRead);
+			if (this.uploadFile(ID, description, filename)){
+				System.out.println("上传文件.....");
+				System.out.println("上传文件成功！");
+			} else {
+				System.out.println("上传文件失败！");
 			}
-			infile.close();
-			targetfile.close();
-			System.out.println("上传文件.....");
-			System.out.println("上传文件成功！");
 		}
-		catch(FileNotFoundException e){
+		catch(FileNotFoundException | ClassNotFoundException e){
 			System.out.println("文件访问错误：" + e);
 		}
 	}
@@ -66,10 +53,10 @@ public class Operator extends User{
 		buf = new BufferedReader(new InputStreamReader(System.in));
 		ID = buf.readLine();
 		try{
-			this.downloadFile(ID);
+			this.downloadFile(ID, new File(downloadpath + DataProcessing.searchDoc(ID).getFilename()));
 			System.out.println("下载文件成功！");
 		}
-		catch(IOException e){
+		catch(IOException | ClassNotFoundException e){
 			System.out.println("文件访问错误：" + e);
 		}
 	}
@@ -79,7 +66,7 @@ public class Operator extends User{
 		try{
 			this.showFileList();
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("文件访问错误：" + e);
 		}
 	}
@@ -98,7 +85,7 @@ public class Operator extends User{
 				this.changeUserInfo(password);
 			}
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("数据库错误：" + e);
 		}
 	}

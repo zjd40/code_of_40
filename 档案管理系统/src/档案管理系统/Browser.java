@@ -1,6 +1,7 @@
 package 档案管理系统;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
@@ -11,18 +12,22 @@ public class Browser extends User{
 		super(name, password, role);
 	}
 	
+	public Browser() {
+		super(null, null, null);
+	}
+
 	public void downloadFile() throws IOException, SQLException{
 		BufferedReader buf;
-		String str;
+		String ID;
 		System.out.println("下载文件界面 ");
 		System.out.print("请输入档案号： ");
 		buf = new BufferedReader(new InputStreamReader(System.in));
-		str = buf.readLine();
+		ID = buf.readLine();
 		try{
-			this.downloadFile(str);
+			this.downloadFile(ID, new File(downloadpath + DataProcessing.searchDoc(ID).getFilename()));
 			System.out.println("下载成功！ ");
 		}
-		catch(IOException e){
+		catch(IOException | ClassNotFoundException e){
 			System.out.println("文件访问错误：" + e);
 		}
 	}
@@ -32,7 +37,7 @@ public class Browser extends User{
 		try{
 			this.showFileList();
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("文件访问错误：" + e);
 		}
 	}
@@ -51,7 +56,7 @@ public class Browser extends User{
 				this.changeUserInfo(password);
 			}
 		}
-		catch(SQLException e){
+		catch(SQLException | ClassNotFoundException e){
 			System.out.println("数据库错误：" + e);
 		}
 	}

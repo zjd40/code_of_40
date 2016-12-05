@@ -19,9 +19,18 @@ public class Main {
 			if (user == null){
 				System.out.println("用户不存在！");
 			}else{
-				user.showMenu();
+				if(user.getRole().equals("administrator")){
+					Administrator a = new Administrator();
+					a.showMenu();
+				} else if(user.getRole().equals("operator")){
+					Operator o = new Operator();
+					o.showMenu();
+				} else {
+					Browser b = new Browser();
+					b.showMenu();
+				}
 			}
-		}catch(SQLException e){
+		}catch(SQLException | ClassNotFoundException e){
 			System.out.println("数据库错误：" + e);
 		}
 	}

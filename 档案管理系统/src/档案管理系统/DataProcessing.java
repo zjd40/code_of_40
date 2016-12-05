@@ -1,174 +1,258 @@
 package 档案管理系统;
-import java.util.Enumeration;
-import java.util.Hashtable;
+
 import java.sql.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
-public  class DataProcessing{
-
-	private static boolean connectToDB=false;
+public class DataProcessing{
+	private static Connection connection;
+	private static Statement statement;
+	private static PreparedStatement preparedStatement;
+	private static ResultSet resultSet;
+	private static boolean connectedToDatabase = false;
+	static String driverName = "com.mysql.jdbc.Driver";
+	static String url = "jdbc:mysql://localhost:3306/document?characterEncoding=utf8&useSSL=true";
+	static String username = "root";
+	static String password = "123456";
 	
-	static Hashtable<String, User> users;
-	static Hashtable<String, Doc> docs;
-
-	static {
-		users = new Hashtable<String, User>();
-		users.put("jack", new Operator("jack","123","operator"));
-		users.put("rose", new Browser("rose","123","browser"));
-		users.put("kate", new Administrator("kate","123","administrator"));
-		Init();
-		
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis()); 
-		docs = new Hashtable<String,Doc>();
-		docs.put("0001",new Doc("0001","jack",timestamp,"Doc Source Java","Doc.java"));
-		
-		
+	public static void connectToDB() throws ClassNotFoundException, SQLException{
+		Class.forName(driverName);											
+		connection = DriverManager.getConnection(url, username, password);	
+		connectedToDatabase = true;
 	}
 	
-	public static  void Init(){
-		// connect to database
-		
-		// update database connection status
-//		if (Math.random()>0.2)
-//			connectToDB = true;
-//		else
-//			connectToDB = false;
-	}
-	
-	public static Doc searchDoc(String ID) throws SQLException {
-		if (docs.containsKey(ID)) {
-			Doc temp =docs.get(ID);
-			return temp;
+	public static void disconnectFromDB(){
+		if (connectedToDatabase)
+		try {
+			resultSet.close();
+			statement.close();
+			connection.close();	
+		} catch (SQLException | NullPointerException e) {
+			//e.printStackTrace();
+		} finally {
+			connectedToDatabase = false;
 		}
-		return null;
 	}
 	
-	public static Enumeration<Doc> getAllDocs() throws SQLException{		
-		Enumeration<Doc> e  = docs.elements();
+	public static Enumeration<User> getAllUser() throws SQLException, ClassNotFoundException{
+		Vector<User> v = new Vector<User>();
+		Enumeration<User> e = null;
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		
+		String sql = "select * from user_info";
+		statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+		resultSet = statement.executeQuery(sql);
+		while (resultSet.next()){
+			String username = resultSet.getString("username");
+			String password = resultSet.getString("password");
+			String role = resultSet.getString("role");
+			v.add(new User(username, password, role));
+		}
+		e = v.elements();
+//		resultSet.close();
+//		statement.close();
+//		connection.close();	
 		return e;
-	} 
+	}
 	
-	public static boolean insertDoc(String ID, String creator, Timestamp timestamp, String description, String filename) throws SQLException{
-		Doc doc;		
+	public static Enumeration<Doc> getAllDocs() throws SQLException, ClassNotFoundException{
+		Vector<Doc> v = new Vector<Doc>();
+		Enumeration<Doc> e = null;
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}
+		
+		String sql = "select * from doc_info";
+		statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+		resultSet = statement.executeQuery(sql);
+		while (resultSet.next()){
+			String id = resultSet.getString("Id");
+			String creator = resultSet.getString("creator");
+			Timestamp timestamp = resultSet.getTimestamp("timestamp");
+			String description = resultSet.getString("description");
+			String filename = resultSet.getString("filename");
+			v.add(new Doc(id, creator, timestamp, description, filename));
+		}
+		e = v.elements();
+//		resultSet.close();
+//		statement.close();
+//		connection.close();	
+		return e;
+	}
 	
-		if (docs.containsKey(ID))
+	public static User searchUser(String name) throws SQLException, ClassNotFoundException{
+		User temp = null;
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}
+		
+		String sql = "select * from user_info where username = ?";
+		preparedStatement = connection.prepareStatement(sql);
+		preparedStatement.setString(1, name);
+		resultSet = preparedStatement.executeQuery();
+		if (resultSet.next()){
+			String password = resultSet.getString("password");
+			String role = resultSet.getString("role");
+			temp = new User(name, password, role);
+		}
+//		resultSet.close();
+		preparedStatement.close();
+//		connection.close();	
+		return temp;
+	}
+	public static User searchUser(String name, String password) throws SQLException, ClassNotFoundException{
+		User temp = null;
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}	
+		
+		String sql = "select * from user_info where username = ?";
+		preparedStatement = connection.prepareStatement(sql);
+		preparedStatement.setString(1, name);
+		resultSet = preparedStatement.executeQuery();
+		if (resultSet.next() && resultSet.getString("password").equals(password)){
+			String role = resultSet.getString("role");
+			temp = new User(name, password, role);
+		}
+//		resultSet.close();
+		preparedStatement.close();
+//		connection.close();
+		return temp;
+	}
+	
+	public static Doc searchDoc(String ID) throws SQLException, ClassNotFoundException{
+		Doc temp = null;
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}	
+		
+		String sql = "select * from doc_info where Id = ?";
+		preparedStatement = connection.prepareStatement(sql);
+		preparedStatement.setString(1, ID);
+		resultSet = preparedStatement.executeQuery();
+		if (resultSet.next()){
+			String creator = resultSet.getString("creator");
+			Timestamp timestamp = resultSet.getTimestamp("timestamp");
+			String description = resultSet.getString("description");
+			String filename = resultSet.getString("filename");
+			temp = new Doc(ID, creator, timestamp, description, filename);
+		}
+//		resultSet.close();
+		preparedStatement.close();
+//		connection.close();
+		return temp;
+	}
+	
+	public static boolean insertUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}	
+		
+		if (searchUser(name) != null){
 			return false;
-		else{
-			doc = new Doc(ID,creator,timestamp,description,filename);
-			docs.put(ID, doc);
+		} else {
+			if (!role.equalsIgnoreCase("administrator") || !role.equalsIgnoreCase("operator")){
+				role = "browser";
+			}
+			String sql = "insert into user_info values(?, ?, ?)";
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, name);
+			preparedStatement.setString(2, password);
+			preparedStatement.setString(3, role);
+			preparedStatement.executeUpdate();
+//			resultSet.close();
+			preparedStatement.close();
+//			connection.close();
 			return true;
 		}
-	} 
+	}
 	
-	
-	public static User searchUser(String name, String password) throws SQLException {
-//		if ( !connectToDB ) 
-//	        throw new SQLException( "Not Connected to Database" );
-//		double ranValue=Math.random();
-//		if (ranValue>0.5)
-//			throw new SQLException( "Error in excecuting Query" );
-		
-		if (users.containsKey(name)) {
-			User temp =users.get(name);
-			if ((temp.getPassword()).equals(password))
-				return temp;
+	public static boolean insertDoc(String ID, String creator, Timestamp timestamp, String description, String filename) throws SQLException, ClassNotFoundException{
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
 		}
-		return null;
+		
+		if (searchDoc(ID) != null){
+			return false;
+		} else {
+			String sql = "insert into doc_info values(?, ?, ?, ?, ?)";
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, ID);
+			preparedStatement.setString(2, creator);
+			preparedStatement.setString(3, timestamp.toString().trim());
+			preparedStatement.setString(4, description);
+			preparedStatement.setString(5, filename);
+			preparedStatement.executeUpdate();
+//			resultSet.close();
+			preparedStatement.close();
+//			connection.close();
+			return true;
+		}
 	}
 	
-	public static Enumeration<User> getAllUser() throws SQLException{
-//		if ( !connectToDB ) 
-//	        throw new SQLException( "Not Connected to Database" );
-//		
-//		double ranValue=Math.random();
-//		if (ranValue>0.5)
-//			throw new SQLException( "Error in excecuting Query" );
+	public static boolean updateUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}
 		
-		Enumeration<User> e  = users.elements();
-		return e;
-	}
-	
-	
-	
-	public static boolean updateUser(String name, String password, String role) throws SQLException{
-		User user;
-//		if ( !connectToDB ) 
-//	        throw new SQLException( "Not Connected to Database" );
-//		
-//		double ranValue=Math.random();
-//		if (ranValue>0.5)
-//			throw new SQLException( "Error in excecuting Update" );
-		
-		if (users.containsKey(name)) {
-			if (role.equalsIgnoreCase("administrator"))
-				user = new Administrator(name,password, role);
-			else if (role.equalsIgnoreCase("operator"))
-				user = new Operator(name,password, role);
-			else
-				user = new Browser(name,password, role);
-			users.put(name, user);
+		if (searchUser(name) != null) {
+			String sql = "update user_info set password = ?, role = ? where username = ?";
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, password);
+			preparedStatement.setString(2, role);
+			preparedStatement.setString(3, name);
+			preparedStatement.executeUpdate();
+//			resultSet.close();
+			preparedStatement.close();
+//			connection.close();
 			return true;
 		}else
 			return false;
 	}
 	
-	public static boolean insertUser(String name, String password, String role) throws SQLException{
-		User user;
+	public static boolean deleteUser(String name) throws SQLException, ClassNotFoundException{
+//		Class.forName(driverName);											
+//		connection = DriverManager.getConnection(url, username, password);	
+		if (connectedToDatabase){
+			throw new SQLException("disconnect to the Database!");
+		}	
 		
-//		if ( !connectToDB ) 
-//	        throw new SQLException( "Not Connected to Database" );
-//		
-//		double ranValue=Math.random();
-//		if (ranValue>0.5)
-//			throw new SQLException( "Error in excecuting Insert" );
-		
-		if (users.containsKey(name))
-			return false;
-		else{
-			if (role.equalsIgnoreCase("administrator"))
-				user = new Administrator(name,password, role);
-			else if (role.equalsIgnoreCase("operator"))
-				user = new Operator(name,password, role);
-			else
-				user = new Browser(name,password, role);
-			users.put(name, user);
-			return true;
-		}
-	}
-	
-	public static boolean deleteUser(String name) throws SQLException{
-//		if ( !connectToDB ) 
-//	        throw new SQLException( "Not Connected to Database" );
-//		
-//		double ranValue=Math.random();
-//		if (ranValue>0.5)
-//			throw new SQLException( "Error in excecuting Delete" );
-		
-		if (users.containsKey(name)){
-			users.remove(name);
+		if (searchUser(name) != null){
+			String sql = "delete from user_info where username = ?";
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, name);
+			preparedStatement.executeUpdate();
+//			resultSet.close();
+			preparedStatement.close();
+//			connection.close();
 			return true;
 		}else
 			return false;
-		
 	}	
-            
-	public void disconnectFromDB() {
-		if ( connectToDB ){
-			// close Statement and Connection            
-			try{
-//				if (Math.random()>0.5)
-//					throw new SQLException( "Error in disconnecting DB" );      
-//			}catch ( SQLException sqlException ){                                            
-//			    sqlException.printStackTrace();           
-			}finally{                                            
-				connectToDB = false;              
-			}                             
-		} 
-   }           
-
+	
+	public static boolean getConnectedToDatabase(){
+		return connectedToDatabase;
+	}
 	
 	public static void main(String[] args) {		
-
+		
 	}
-	
 }
-

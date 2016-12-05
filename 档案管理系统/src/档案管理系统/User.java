@@ -1,24 +1,26 @@
 package 档案管理系统;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.io.*;
 
-public abstract class User {
+public class User {
 	private String name;
 	private String password;
 	private String role;
 	
 	String uploadpath = "e:\\OPP\\uploadfile\\";
 	String downloadpath = "e:\\OPP\\downloadfile\\";
-	
-	User(String name,String password,String role){
+
+	public User(String name,String password,String role){
+		super();
 		this.name=name;
 		this.password=password;
 		this.role=role;				
 	}
 	
-	public boolean changeUserInfo(String password) throws SQLException{
+	public boolean changeUserInfo(String password) throws SQLException, ClassNotFoundException{
 		//写用户信息到存储
 		if (DataProcessing.updateUser(name, password, role)){
 			this.password=password;
@@ -28,12 +30,7 @@ public abstract class User {
 			return false;
 	}
 	
-	public boolean downloadFile(String ID) throws IOException, SQLException{
-		//double ranValue=Math.random();
-		//if (ranValue>0.5)
-			//throw new IOException( "Error in accessing file" );
-		
-		//boolean result = false;
+	public boolean downloadFile(String ID, File file) throws IOException, SQLException, ClassNotFoundException{
 		byte[] buffer = new byte[1024];
 		Doc doc = DataProcessing.searchDoc(ID);
 		
@@ -42,9 +39,8 @@ public abstract class User {
 		}
 		
 		File tempFile = new File(uploadpath + doc.getFilename());
-		String filename = tempFile.getName();
 		BufferedInputStream infile = new BufferedInputStream(new FileInputStream(tempFile));
-		BufferedOutputStream targetfile = new BufferedOutputStream(new FileOutputStream(new File(downloadpath + filename), false));
+		BufferedOutputStream targetfile = new BufferedOutputStream(new FileOutputStream(file, false));
 		
 		while(true){
 			int byteRead = infile.read(buffer);	//从文件读数据给字节数组
@@ -55,14 +51,36 @@ public abstract class User {
 		}
 		infile.close();
 		targetfile.close();
-		//System.out.println("下载文件... ...");
 		return true;
 	}
 	
-	public void showFileList() throws SQLException{
-		//double ranValue=Math.random();
-		//if (ranValue>0.5)
-			//throw new SQLException( "Error in accessing file DB" );
+	public boolean uploadFile(String ID, String Description, String FileName) throws IOException, SQLException, ClassNotFoundException{
+		Doc doc = DataProcessing.searchDoc(ID);
+		if(doc != null){
+			return false;
+		}
+		File tempFile = new File(FileName);
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		byte[] buffer = new byte[1024];
+		DataProcessing.insertDoc(ID ,this.getName(), timestamp, Description, tempFile.getName());
+		BufferedInputStream infile = new BufferedInputStream(new FileInputStream(FileName));
+		BufferedOutputStream targetfile = new BufferedOutputStream(new FileOutputStream(new File(uploadpath + tempFile.getName()), false));
+		
+		while(true){
+			int byteRead = infile.read(buffer);
+			if (byteRead == -1){
+				break;
+			}
+			targetfile.write(buffer, 0, byteRead);
+		}
+		infile.close();
+		targetfile.close();
+		DataProcessing.insertDoc(ID, this.getName(), timestamp, Description, tempFile.getName());
+		return true;
+
+	}
+	
+	public void showFileList() throws SQLException, ClassNotFoundException{
 		Enumeration<Doc> e = DataProcessing.getAllDocs();
 		Doc doc;
 		while(e.hasMoreElements()){
@@ -79,8 +97,6 @@ public abstract class User {
 		}
 		System.out.println("列表... ...");
 	}
-	
-	public abstract void showMenu() throws IOException, SQLException;
 	
 	public void exitSystem(){
 		System.out.println("系统退出, 谢谢使用 ! ");

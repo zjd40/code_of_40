@@ -227,11 +227,10 @@ void  translateHuffmanCode(int n)
 {
 	//从根出发获得译码的字串
 	HuffmanTree Ht = (HuffmanTree)malloc((2 * n) * sizeof(HTNdoe));
-	//HuffmanTree p;
 	string code;
 	int i, count = 2 * n - 1;
 	char *str = new char[256];
-	for (i = 1; i <= 2 * n - 1; i++)
+	for (i = 1; i <= 2 * n - 1; i++)	//获取赫夫曼树表
 	{
 		readFile("HuffmanTree.txt", str, i);
 		tranInfo(Ht, str, i);
