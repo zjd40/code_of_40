@@ -12,6 +12,24 @@ void initFile()
 	fclose(fp);
 	fp = fopen("HuffmanCode.txt", "wt");
 	fclose(fp);
+	fp = fopen("code.txt", "wt");
+	fclose(fp);
+}
+
+int getFileSize(const char* filename)
+{
+	FILE *fp;
+	int filesize;
+	if ((fp = fopen(filename, "rt")) == NULL)
+	{
+		printf("无法打开文件");
+		getchar();
+		exit(1);
+	}
+	fseek(fp, 0, SEEK_END);
+	filesize = ftell(fp);
+	fclose(fp);
+	return filesize;
 }
 
  void readFile(const char* filename, char* str, int n)
@@ -25,11 +43,24 @@ void initFile()
 		exit(1);
 	}
 	for (int i = 0; i < n; i++)
-		fgets(str, 32, fp);
+		fgets(str, 256, fp);
 	fclose(fp);
 }
 
-void writeFile(const char* filename, char* str)
+ void readFile(const char* filename, char* buf)
+ {
+	 FILE *fp;
+	 if ((fp = fopen(filename, "rt")) == NULL)
+	 {
+		 printf("无法打开文件");
+		 getchar();
+		 exit(1);
+	 }
+	 fread(buf, 1, getFileSize(filename) * sizeof(char), fp);
+	 fclose(fp);
+ }
+
+void writeFile(const char* filename, const char* str)
 {
 	//从文件中写入信息
 	FILE *fp = NULL;
@@ -59,5 +90,8 @@ int get_Num_of_Line(const char* filename)
 		count++;
 	return count;
 }
+
+
+
 
 

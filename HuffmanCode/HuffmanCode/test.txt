@@ -1,0 +1,68 @@
+#include "myHuffmanCode.hpp"
+#include "myBMP.hpp"
+
+int main()
+{
+	int n = 0;
+	while (true)
+	{
+		printf("1-------------------\n");
+		printf("2-------------------\n");
+		printf("3---------------------\n");
+		printf("0---------------------\n");
+		printf("");
+		string s = " ";
+		getline(cin, s);
+		if (strcmp(s.c_str(), "1") == 0)
+		{
+			HuffmanTree HT;
+			HuffmanCode HC;
+			double w[26] = { 0 };
+			string str;
+			initFile();
+			Init();
+			printf("");
+			getline(cin, str);
+			for (int i = 0; i < str.size(); i++)
+				Read_char(n, str[i]);
+			getWeight(w, n, str.size());
+			HuffmanCoding(HT, HC, w, n);
+		}
+		if (strcmp(s.c_str(), "3") == 0) 
+		{
+			HuffmanTree HT;
+			HuffmanCode HC;
+			char* filename;
+			int num_of_line = get_Num_of_Line(filename) - 1;
+			int count = 0;
+			int length = 0;
+			double w[26] = { 0 };
+			char* str = NULL;
+			do 
+			{
+				readFile(filename, str, ++count);
+				for(int i = 0;i<strlen(str);i++)
+					Read_char(n, str[i]);
+				length += strlen(str);
+			} while (count = num_of_line);
+			getWeight(w, n, length);
+			HuffmanCoding(HT, HC, w, n);
+		}
+		if (strcmp(s.c_str(), "3") == 0)
+		{
+			n = get_Num_of_Line("HuffmanCode.txt") - 1;
+			readFile("HuffmanCode.txt", HuffmanCodeChar, 1);
+			translateHuffmanCode(n);
+		}
+		if (strcmp(s.c_str(), "4") == 0)
+		{
+			initFile();
+			myBMP("mytower.bmp", n);
+		}
+		if (strcmp(s.c_str(), "0") == 0)
+			break;
+		printf("\n");
+	}
+	system("pause");
+	return 0;
+}

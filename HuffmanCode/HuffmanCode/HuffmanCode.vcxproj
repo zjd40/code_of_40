@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="myBMP.hpp" />
     <ClInclude Include="myFile.hpp" />
     <ClInclude Include="myHuffmanCode.hpp" />
   </ItemGroup>

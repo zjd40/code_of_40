@@ -2,64 +2,69 @@
 #include "myFile.hpp"
 #include <malloc.h>
 
-#define MAX_CHAR 26
+#define MAX_CHAR 256
+#define MIN_CHAR -128
 
 typedef struct {
-	unsigned int weight;
+	double weight;
 	unsigned int parent, lchild, rchild;
 }HTNdoe,*HuffmanTree;	//动态分配数组存储赫夫曼树
 
-typedef char **HuffmanCode;	//动态分配数组存储赫夫曼编码表
+typedef struct Table {
+	int tap;
+	double num;
+};
 
-unsigned int ch[MAX_CHAR] = { 0 };
-char HuffmanCodeChar[MAX_CHAR];
+typedef char **HuffmanCode;					//动态分配数组存储赫夫曼编码表
+char HuffmanCodeChar[MAX_CHAR - MIN_CHAR];	//记录编码字符
+Table ch[MAX_CHAR - MIN_CHAR];				//记录编码字符出现次数
 
-void Read_char(unsigned int *w, int &n)
+void Init()
 {
-	//从终端读入一段英文字符，统计每个字符出现的频率
-	string str;
-	int i, count = 0;
-	printf("请输入字符串（全小写英文字母）：");
-	getline(cin, str);
-	for (i = 0; i < str.size(); i++)
-		if (str[i] >= 'a' && str[i] <= 'z')
-			ch[str[i] - 'a']++;
-	for (i = 0; i < MAX_CHAR; i++)
-		if (ch[i] != 0)
-		{
-			w[count] = ch[i] * 100 / str.size();	//由于w类型为unsigned int，且等号右边式子优先级从左到右，为避免运算错误，先乘100
-													//权运算为：w=当前字符个数/总字符个数*100%
-			HuffmanCodeChar[count] = i + 'a';
-			count++;
-		}
-	n = count;
-	return;
+	for (int i = 0; i < MAX_CHAR - MIN_CHAR; i++)
+	{
+		HuffmanCodeChar[i] = '\0';	//初始化ch表和HuffmanCodeChar表
+		ch[i].num = 0;
+		ch[i].tap = 0;
+	}
 }
 
-void getHuffmanCodeChar()
+void Read_char(int &n, char c)
 {
-	readFile("HuffmanCode.txt", HuffmanCodeChar, 1);
+	if (ch[c - MIN_CHAR].num == 0)
+	{
+		ch[c - MIN_CHAR].tap = n;
+		HuffmanCodeChar[n++] = c;
+	}
+	ch[c - MIN_CHAR].num++;	//计算每种字符出现次数
+}
+
+void getWeight(double *w, int n,int count)
+{
+	for (int i = 0; i < n; i++)
+		w[i] = ch[HuffmanCodeChar[i] - MIN_CHAR].num / count * 100;	//权运算为：w=当前字符个数/总字符个数*100%
 }
 
 void tranInfo(HuffmanTree &HT, char* str,int n)
 {
 	//将字符表内信息转换成赫夫曼树信息
-	bool flag = false;	//判断是否开始记录数据
-	char c[3];
-	int x = 0, count = 1;
-	unsigned int num = 0;
+	bool flag = false;
+	char c[16];
+	int x = 0, count = 1, decimal = 1;
+	unsigned int num;
 	for (int i = 0; i < strlen(str); i++)
 	{
 		if (str[i] == ':')
 			flag = true;
-		if (str[i] >= '0' && str[i] <= '9' && flag)
+		if (flag && ((str[i] >= '0' && str[i] <= '9') || str[i] == '.'))
 			c[x++] = str[i];
 		else
 		{
 			if(x != 0)
 			{
 				for (int k = 0; k < x; k++)
-					num = num * 10 + c[k] - '0';
+					if (count != 1)
+						num = num * 10 + c[k] - '0';
 				switch (count++)
 				{
 				case 1:HT[n].weight = num; break;
@@ -77,13 +82,10 @@ void tranInfo(HuffmanTree &HT, char* str,int n)
 void Selete(HuffmanTree HT, int n, unsigned int &s1, unsigned int &s2)
 {
 	//在HT[1..i-1]选择parent为0且weight最小的两个结点，其序号分别为s1和s2
-	unsigned min1 = 100, min2 = 100;	//100为权总值
+	double min1 = 100.00, min2 = 100.00;	//100为权总值
 	for (int i = 1; i <= n; i++)
-	{
 		if (HT[i].parent == 0)	//当结点的父亲明不确时，说明该结点可以进行比较，否则不可使用
-		{
 			if (HT[i].weight < min2)
-			{
 				if (HT[i].weight < min1)
 				{
 					min1 = HT[i].weight;
@@ -94,23 +96,20 @@ void Selete(HuffmanTree HT, int n, unsigned int &s1, unsigned int &s2)
 					min2 = HT[i].weight;
 					s2 = i;
 				}
-			}
-		}
-	}
 }
 
 void printHuffmanTreeTable(HuffmanTree p,int n)
 {
 	//用列表形式打印赫夫曼树列表
 	char buf[100];
+	printf("\n赫夫曼树表为：\n\n");
 	for (int i = 1; i <= 2 * n - 1; i++, p++)
 	{
-		sprintf(buf, "%d:\t%d\t%d\t%d\t%d\n", i, (*p).weight, (*p).parent, (*p).lchild, (*p).rchild);
+		sprintf(buf, "%d:\t%lf\t%d\t%d\t%d\n", i, (*p).weight, (*p).parent, (*p).lchild, (*p).rchild);
 		printf(buf);
 		writeFile("HuffmanTree.txt", buf);
 	}
 	printf("\n");
-	writeFile("HuffmanTree.txt", "\n");
 }
 
 void printHuffmanCode(HuffmanCode HC,int n)
@@ -118,6 +117,7 @@ void printHuffmanCode(HuffmanCode HC,int n)
 	//打印赫夫曼编码HC
 	char buf[100];
 	writeFile("HuffmanCode.txt", HuffmanCodeChar);
+	printf("赫夫曼b编码表为：\n");
 	for (int i = 1; i <= n; i++)
 	{
 		sprintf(buf, "\n%d %c: ", i, HuffmanCodeChar[i - 1]);
@@ -132,10 +132,30 @@ void printHuffmanCode(HuffmanCode HC,int n)
 			writeFile("HuffmanCode.txt", buf);
 		}
 	}
-	printf("\n");
+	printf("\n\n");
 }
 
-void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, unsigned int *w, int n)
+void setRecord(HuffmanCode HC, string str, int n)
+{
+	printf("wait.............\n");
+	/*
+	for (int i = 0; i < str.size(); i++)
+		for (int j = 0; j < n; j++)
+			if (str[i] == HuffmanCodeChar[j])
+			{
+				writeFile("code.txt", HC[ch[str[i] - MIN_CHAR].tap + 1]);
+				break;
+			}*/
+	string code;
+	for (int i = 0; i < str.size(); i++)
+		code += HC[ch[str[i] - MIN_CHAR].tap + 1];
+	writeFile("code.txt", code.c_str());
+	printf("OK!\n");
+	printf("size of BMP：\t %d\n", getFileSize("myImage.bmp"));
+	printf("size of txt：\t %d\n", getFileSize("code.txt"));
+}
+
+void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, double *w, int n, string str)
 {
 	//w存放n个字符的权值（均>0），构造赫夫曼树HT，并求出n个字符的赫夫曼编码HC
 	if (n <= 1)
@@ -178,6 +198,7 @@ void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, unsigned int *w, int n)
 	}
 	free(cd);	//释放工作空间
 	printHuffmanCode(HC, n);
+	setRecord(HC, str, n);
 
 	/*
 	//-----无栈非递归遍历赫夫曼树，求赫夫曼编码-----
@@ -223,20 +244,17 @@ void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, unsigned int *w, int n)
 	*/
 }
 
-void  translateHuffmanCode(int n)
+void  translateHuffmanCode(const char* HuffmanTablefilename, int n, string code)
 {
 	//从根出发获得译码的字串
 	HuffmanTree Ht = (HuffmanTree)malloc((2 * n) * sizeof(HTNdoe));
-	string code;
 	int i, count = 2 * n - 1;
-	char *str = new char[256];
+	char *str = new char[256];;
 	for (i = 1; i <= 2 * n - 1; i++)	//获取赫夫曼树表
 	{
-		readFile("HuffmanTree.txt", str, i);
+		readFile(HuffmanTablefilename, str, i);
 		tranInfo(Ht, str, i);
 	}
-	printf("请输入01编码：");
-	getline(cin, code);
 	printf("译码为：");
 	for (i = 0; i < code.size(); i++)
 	{

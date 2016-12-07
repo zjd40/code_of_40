@@ -1,5 +1,9 @@
 ﻿  main.cpp
-e:\github\github\huffmancode\huffmancode\myhuffmancode.hpp(24): warning C4018: “<”: 有符号/无符号不匹配
-e:\github\github\huffmancode\huffmancode\myhuffmancode.hpp(51): warning C4018: “<”: 有符号/无符号不匹配
-e:\github\github\huffmancode\huffmancode\myhuffmancode.hpp(241): warning C4018: “<”: 有符号/无符号不匹配
-LINK : fatal error LNK1201: 写入程序数据库“E:\github\github\HuffmanCode\Debug\HuffmanCode.pdb”时出错；请检查是否是磁盘空间不足、路径无效或权限不够
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(16): warning C4091: “typedef ”: 没有声明变量时忽略“Table”的左侧
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(55): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(150): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\myhuffmancode.hpp(259): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\mybmp.hpp(46): warning C4091: “typedef ”: 没有声明变量时忽略“RGB_QUAD”的左侧
+c:\users\administrator\documents\visual studio 2015\projects\huffmancode\huffmancode\main.cpp(27): warning C4018: “<”: 有符号/无符号不匹配
+  HuffmanCode.vcxproj -> C:\Users\Administrator\Documents\Visual Studio 2015\Projects\HuffmanCode\Debug\HuffmanCode.exe
+  HuffmanCode.vcxproj -> C:\Users\Administrator\Documents\Visual Studio 2015\Projects\HuffmanCode\Debug\HuffmanCode.pdb (Full PDB)
