@@ -24,7 +24,7 @@ public class DataProcessing{
 			statement.close();
 			connection.close();	
 		} catch (SQLException | NullPointerException e) {
-			//e.printStackTrace();
+			
 		} finally {
 			connectedToDatabase = false;
 		}
@@ -36,8 +36,6 @@ public class DataProcessing{
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		
 		String sql = "select * from user_info";
 		statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
@@ -49,17 +47,12 @@ public class DataProcessing{
 			v.add(new User(username, password, role));
 		}
 		e = v.elements();
-//		resultSet.close();
-//		statement.close();
-//		connection.close();	
 		return e;
 	}
 	
 	protected static Enumeration<Doc> getAllDocs() throws SQLException, ClassNotFoundException{
 		Vector<Doc> v = new Vector<Doc>();
 		Enumeration<Doc> e = null;
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}
@@ -76,16 +69,11 @@ public class DataProcessing{
 			v.add(new Doc(id, creator, timestamp, description, filename));
 		}
 		e = v.elements();
-//		resultSet.close();
-//		statement.close();
-//		connection.close();	
 		return e;
 	}
 	
 	protected static User searchUser(String name) throws SQLException, ClassNotFoundException{
 		User temp = null;
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}
@@ -99,15 +87,11 @@ public class DataProcessing{
 			String role = resultSet.getString("role");
 			temp = new User(name, password, role);
 		}
-//		resultSet.close();
 		preparedStatement.close();
-//		connection.close();	
 		return temp;
 	}
 	protected static User searchUser(String name, String password) throws SQLException, ClassNotFoundException{
 		User temp = null;
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}	
@@ -120,16 +104,12 @@ public class DataProcessing{
 			String role = resultSet.getString("role");
 			temp = new User(name, password, role);
 		}
-//		resultSet.close();
 		preparedStatement.close();
-//		connection.close();
 		return temp;
 	}
 	
 	protected static Doc searchDoc(String ID) throws SQLException, ClassNotFoundException{
 		Doc temp = null;
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}	
@@ -145,15 +125,11 @@ public class DataProcessing{
 			String filename = resultSet.getString("filename");
 			temp = new Doc(ID, creator, timestamp, description, filename);
 		}
-//		resultSet.close();
 		preparedStatement.close();
-//		connection.close();
 		return temp;
 	}
 	
 	protected static boolean insertUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}	
@@ -170,16 +146,12 @@ public class DataProcessing{
 			preparedStatement.setString(2, password);
 			preparedStatement.setString(3, role);
 			preparedStatement.executeUpdate();
-//			resultSet.close();
 			preparedStatement.close();
-//			connection.close();
 			return true;
 		}
 	}
 	
 	protected static boolean insertDoc(String ID, String creator, Timestamp timestamp, String description, String filename) throws SQLException, ClassNotFoundException{
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}
@@ -195,16 +167,12 @@ public class DataProcessing{
 			preparedStatement.setString(4, description);
 			preparedStatement.setString(5, filename);
 			preparedStatement.executeUpdate();
-//			resultSet.close();
 			preparedStatement.close();
-//			connection.close();
 			return true;
 		}
 	}
 	
 	protected static boolean updateUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}
@@ -216,17 +184,13 @@ public class DataProcessing{
 			preparedStatement.setString(2, role);
 			preparedStatement.setString(3, name);
 			preparedStatement.executeUpdate();
-//			resultSet.close();
 			preparedStatement.close();
-//			connection.close();
 			return true;
 		}else
 			return false;
 	}
 	
 	protected static boolean deleteUser(String name) throws SQLException, ClassNotFoundException{
-//		Class.forName(driverName);											
-//		connection = DriverManager.getConnection(url, username, password);	
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}	
@@ -236,9 +200,7 @@ public class DataProcessing{
 			preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setString(1, name);
 			preparedStatement.executeUpdate();
-//			resultSet.close();
 			preparedStatement.close();
-//			connection.close();
 			return true;
 		}else
 			return false;

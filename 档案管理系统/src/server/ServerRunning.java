@@ -1,8 +1,13 @@
 package server;
 
+import java.io.IOException;
+
 public class ServerRunning {
 	public static void main(String[] args) throws ClassNotFoundException {
-		Server application = new Server();
-		application.runServer();
+		try {
+			new Server();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

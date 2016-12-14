@@ -7,12 +7,12 @@ import java.util.Queue;
 
 import javax.swing.JOptionPane;
 
-public class Client
-{
-	private static ObjectOutputStream output; 
-	protected ObjectInputStream input; 
-	private String chatServer; 
-	private Socket client;
+public class Client {
+	private static final int CILENT_PORT = 2048;
+	private Socket socket;
+	private static PrintWriter printWriter;
+	private static BufferedReader bufferedReader;
+	private String chatServer;
 	protected Queue<String> message;
 	protected String userName;
 	protected String userRole;
@@ -24,30 +24,19 @@ public class Client
       message = new LinkedList<String>();
       runClient();
    }
-
-	protected void getMessage() throws IOException, ClassNotFoundException, NullPointerException{
-		String tempMessage;
-		tempMessage = (String)input.readObject();
-		message.offer(tempMessage);
-		while (!tempMessage.equals("SUCCESS") 
-				&& !tempMessage.equals("FAIL") 
-				&& !tempMessage.equals("NONE")){
-			tempMessage = (String)input.readObject();
-			message.offer(tempMessage);
-		}
-		displayMessage(message.poll());
+	
+	private void startClient() throws UnknownHostException, IOException{
+		socket =new Socket(chatServer, CILENT_PORT);
+		socket.setSoTimeout(60000);
+		printWriter =new PrintWriter(socket.getOutputStream(),true);
+		bufferedReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	}
 	
-	protected void sendMessage(String message) throws IOException{
-		output.writeObject(message);
-	}
-	
-	
-	protected void runClient() throws ClassNotFoundException, IOException{
+	private void runClient() throws ClassNotFoundException, IOException{
 		try{
-			connectToServer();
-			getStreams();
-			processConnection();
+			startClient();
+            displayMessage("连接成功");
+    		new LoginFrame(this);
 		} catch ( EOFException eofException ){
 			displayMessage("客户端终止连接");
 		} catch ( IOException ioException ) {
@@ -55,34 +44,22 @@ public class Client
 		}
 	}
 	
-	private void connectToServer() throws IOException, ClassNotFoundException{
-		displayMessage("尝试连接中......");
-		client = new Socket( InetAddress.getByName( chatServer ), 2048 );
-		displayMessage("Connected to: " + client.getInetAddress().getHostName());
+	protected void sendMessage(String message) throws IOException{
+		printWriter.println(message);
+        printWriter.flush();
 	}
 	
-	private void getStreams() throws IOException, ClassNotFoundException{
-		output = new ObjectOutputStream( client.getOutputStream() );
-		output.flush();
-		input = new ObjectInputStream( client.getInputStream() );
-		displayMessage("获取信息流中......");
-	}
-	
-	private void processConnection() throws IOException, ClassNotFoundException{
-		displayMessage("连接成功");
-		new LoginFrame(this);
-	}
-	
-	private void closeConnection() throws ClassNotFoundException, IOException 
-	{
-		displayMessage("关闭接口");
-		try {
-			output.close();
-			input.close();
-			client.close();
-		} catch ( IOException ioException ) {
-			ioException.printStackTrace();
+	protected void getMessage() throws IOException, ClassNotFoundException, NullPointerException{
+		String tempMessage;
+		tempMessage = bufferedReader.readLine();
+		message.offer(tempMessage);
+		while (!tempMessage.equals("SUCCESS") 
+				&& !tempMessage.equals("FAIL") 
+				&& !tempMessage.equals("NONE")){
+			tempMessage = bufferedReader.readLine();
+			message.offer(tempMessage);
 		}
+		displayMessage(message.poll());
 	}
 	
 	private void displayMessage(final String messageToDisplay) throws ClassNotFoundException, IOException{
@@ -100,7 +77,10 @@ public class Client
 				break;
 			case "QUIT":
 				JOptionPane.showMessageDialog(null, "User " + userName + " 退出");
-				closeConnection();
+				message.poll();
+				printWriter.close();
+	            bufferedReader.close();
+	            socket.close();
 				break;
 			default:
 				System.out.println("SERVER >>> " + messageToDisplay);

@@ -5,18 +5,19 @@ import java.io.*;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Enumeration;
+import server.Server.ServerThread;
 public class MessageOperation {
 	private DataProcessing dataProcessing;
-	private Server server;
+	private ServerThread serverThread;
 	private User myuser;
 	
-	private static String driverName = "com.mysql.jdbc.Driver";
-	private static String url = "jdbc:mysql://localhost:3306/document?characterEncoding=utf8&useSSL=true";
-	private static String username = "root";
-	private static String password = "123456";
+	private final String driverName = "com.mysql.jdbc.Driver";
+	private final String url = "jdbc:mysql://localhost:3306/document?characterEncoding=utf8&useSSL=true";
+	private final String username = "root";
+	private final String password = "123456";
 	
 	public MessageOperation(){
-		this.server = null;
+		this.serverThread = null;
 		myuser = null;
 	}
 	
@@ -24,8 +25,8 @@ public class MessageOperation {
 		return myuser;
 	}
 
-	public void setServer(Server server) {
-		this.server = server;
+	public void setServerThread(ServerThread serverThread) {
+		this.serverThread = serverThread;
 	}
 	
 	protected void connection(){
@@ -41,13 +42,13 @@ public class MessageOperation {
 		try {
 			myuser = DataProcessing.searchUser(name, password);
 			if (myuser != null) {
-				server.sendMessage("成功登录");
-				server.sendMessage(myuser.getName());
-				server.sendMessage(myuser.getRole());
-				server.sendMessage("SUCCESS");
+				serverThread.sendMessage("成功登录");
+				serverThread.sendMessage(myuser.getName());
+				serverThread.sendMessage(myuser.getRole());
+				serverThread.sendMessage("SUCCESS");
 			} else {
-				server.sendMessage("登录失败");
-				server.sendMessage("FAIL");
+				serverThread.sendMessage("登录失败");
+				serverThread.sendMessage("FAIL");
 			}
 		} catch (SQLException | ClassNotFoundException | IOException e){
 			e.printStackTrace();
@@ -58,16 +59,16 @@ public class MessageOperation {
 		try{
 			User user;
 			Enumeration<User> elem = DataProcessing.getAllUser();
-			server.sendMessage("遍历用户信息成功");
+			serverThread.sendMessage("遍历用户信息成功");
 			user = elem.nextElement();
-			server.sendMessage(user.getPassword());
-			server.sendMessage(user.getRole());
-			server.sendMessage(user.getName());
+			serverThread.sendMessage(user.getPassword());
+			serverThread.sendMessage(user.getRole());
+			serverThread.sendMessage(user.getName());
 			while (elem.hasMoreElements()){
 				user = elem.nextElement();
-				server.sendMessage(user.getName());
+				serverThread.sendMessage(user.getName());
 			}
-			server.sendMessage("SUCCESS");
+			serverThread.sendMessage("SUCCESS");
 		}
 		catch(SQLException | ClassNotFoundException | IOException e){
 			e.printStackTrace();
@@ -79,13 +80,13 @@ public class MessageOperation {
 		try {
 			user = DataProcessing.searchUser(name);
 			if (user != null){
-				server.sendMessage("检索用户成功");
-				server.sendMessage(user.getPassword());
-				server.sendMessage(user.getRole());
-				server.sendMessage("SUCCESS");
+				serverThread.sendMessage("检索用户成功");
+				serverThread.sendMessage(user.getPassword());
+				serverThread.sendMessage(user.getRole());
+				serverThread.sendMessage("SUCCESS");
 			} else {
-				server.sendMessage("检索用户失败");
-				server.sendMessage("FAIL");
+				serverThread.sendMessage("检索用户失败");
+				serverThread.sendMessage("FAIL");
 			}
 		} catch (SQLException | ClassNotFoundException | IOException e1) {
 			e1.printStackTrace();
@@ -97,11 +98,11 @@ public class MessageOperation {
 			if (name.length() != 0 
 					&& password.length() != 0 
 					&& DataProcessing.insertUser(name, password, role)){
-				server.sendMessage("新增用户成功");
-				server.sendMessage("SUCCESS");
+				serverThread.sendMessage("新增用户成功");
+				serverThread.sendMessage("SUCCESS");
 			} else {
-				server.sendMessage("新增用户失败");
-				server.sendMessage("FAIL");
+				serverThread.sendMessage("新增用户失败");
+				serverThread.sendMessage("FAIL");
 			}
 		}catch(SQLException | HeadlessException | ClassNotFoundException | IOException e){
 			e.printStackTrace();
@@ -111,11 +112,11 @@ public class MessageOperation {
 	protected void changeuser(String name, String password, String role){
 		try{
 			 if (DataProcessing.updateUser(name, password, role)){
-				 server.sendMessage("修改用户信息成功");
-				 server.sendMessage("SUCCESS");
+				 serverThread.sendMessage("修改用户信息成功");
+				 serverThread.sendMessage("SUCCESS");
 			 } else {
-				 server.sendMessage("修改用户信息失败");
-				 server.sendMessage("FAIL");
+				 serverThread.sendMessage("修改用户信息失败");
+				 serverThread.sendMessage("FAIL");
 			 }
 		}
 		catch(SQLException | HeadlessException | ClassNotFoundException | IOException e){
@@ -126,12 +127,12 @@ public class MessageOperation {
 	protected void deleteuser(String name){
 		try{
 			if (DataProcessing.deleteUser(String.valueOf(name))){
-				server.sendMessage("删除用户成功");
-				server.sendMessage("SUCCESS");
+				serverThread.sendMessage("删除用户成功");
+				serverThread.sendMessage("SUCCESS");
 			}
 			else{
-				server.sendMessage("删除用户失败");
-				server.sendMessage("FAIL");
+				serverThread.sendMessage("删除用户失败");
+				serverThread.sendMessage("FAIL");
 			}
 		}
 		catch(SQLException | HeadlessException | ClassNotFoundException | IOException error){
@@ -143,22 +144,22 @@ public class MessageOperation {
 		try{
 			Doc doc;
 			Enumeration<Doc> elem = DataProcessing.getAllDocs();
-			server.sendMessage("遍历档案信息成功");
+			serverThread.sendMessage("遍历档案信息成功");
 			doc = elem.nextElement();
-			server.sendMessage(doc.getFilename());
-			server.sendMessage(doc.getCreator());
-			server.sendMessage(String.valueOf(doc.getTimestamp()));
+			serverThread.sendMessage(doc.getFilename());
+			serverThread.sendMessage(doc.getCreator());
+			serverThread.sendMessage(String.valueOf(doc.getTimestamp()));
 			if (doc.getDescription() == null){
-				server.sendMessage("null");
+				serverThread.sendMessage("null");
 			} else {
-				server.sendMessage(doc.getDescription());
+				serverThread.sendMessage(doc.getDescription());
 			}
-			server.sendMessage(doc.getID());
+			serverThread.sendMessage(doc.getID());
 			while (elem.hasMoreElements()){
 				doc = elem.nextElement();
-				server.sendMessage(doc.getID());
+				serverThread.sendMessage(doc.getID());
 			}
-			server.sendMessage("SUCCESS");
+			serverThread.sendMessage("SUCCESS");
 		}
 		catch(SQLException | ClassNotFoundException | IOException e){
 			e.printStackTrace();
@@ -170,15 +171,15 @@ public class MessageOperation {
 		try {
 			doc = DataProcessing.searchDoc(id);
 			if (id != null){
-				server.sendMessage("检索档案成功");
-				server.sendMessage(doc.getFilename());
-				server.sendMessage(doc.getCreator());
-				server.sendMessage(String.valueOf(doc.getTimestamp()));
-				server.sendMessage(doc.getDescription());
-				server.sendMessage("SUCCESS");
+				serverThread.sendMessage("检索档案成功");
+				serverThread.sendMessage(doc.getFilename());
+				serverThread.sendMessage(doc.getCreator());
+				serverThread.sendMessage(String.valueOf(doc.getTimestamp()));
+				serverThread.sendMessage(doc.getDescription());
+				serverThread.sendMessage("SUCCESS");
 			} else {
-				server.sendMessage("检索用户失败");
-				server.sendMessage("FAIL");
+				serverThread.sendMessage("检索档案失败");
+				serverThread.sendMessage("FAIL");
 			}
 		} catch (SQLException | ClassNotFoundException | IOException e1) {
 			e1.printStackTrace();
@@ -190,11 +191,11 @@ public class MessageOperation {
 		try {
 			if (file.getAbsolutePath() != null){
 				myuser.downloadFile(id, file);
-				server.sendMessage("下载文件成功");
-				server.sendMessage("SUCCESS");
+				serverThread.sendMessage("下载文件成功");
+				serverThread.sendMessage("SUCCESS");
 			} else {
-				server.sendMessage("下载文件失败");
-				server.sendMessage("FAIL");
+				serverThread.sendMessage("下载文件失败");
+				serverThread.sendMessage("FAIL");
 			}
 		} catch (SQLException | IOException | ClassNotFoundException error) {
 			error.printStackTrace();
@@ -213,11 +214,11 @@ public class MessageOperation {
 							new Timestamp(System.currentTimeMillis()), 
 							description, 
 							file.getName());
-					server.sendMessage("上传文件成功");
-					server.sendMessage("SUCCESS");
+					serverThread.sendMessage("上传文件成功");
+					serverThread.sendMessage("SUCCESS");
 				} else {
-					server.sendMessage("上传文件失败");
-					server.sendMessage("FAIL");
+					serverThread.sendMessage("上传文件失败");
+					serverThread.sendMessage("FAIL");
 				}
 			}
 		} catch (SQLException | IOException | HeadlessException | ClassNotFoundException e1) {
@@ -231,15 +232,15 @@ public class MessageOperation {
 			if (user != null){
 				if (!oldpassword.equals(newpassword)) {
 					user.changeUserInfo(newpassword);
-					server.sendMessage("修改密码成功");
-					server.sendMessage("SUCCESS");
+					serverThread.sendMessage("修改密码成功");
+					serverThread.sendMessage("SUCCESS");
 				} else { 
-					server.sendMessage("修改密码失败");
-					server.sendMessage("FAIL");
+					serverThread.sendMessage("修改密码失败");
+					serverThread.sendMessage("FAIL");
 				}
 			} else {
-				server.sendMessage("修改密码失败");
-				server.sendMessage("FAIL");
+				serverThread.sendMessage("修改密码失败");
+				serverThread.sendMessage("FAIL");
 			}
 		} catch (SQLException | ClassNotFoundException | IOException e) {
 			e.printStackTrace();
@@ -248,8 +249,8 @@ public class MessageOperation {
 	
 	protected void quit(){
 		try {
-			server.sendMessage("QUIT");
-			server.sendMessage("NONE");
+			serverThread.sendMessage("QUIT");
+			serverThread.sendMessage("NONE");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

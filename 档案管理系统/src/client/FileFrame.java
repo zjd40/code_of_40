@@ -224,7 +224,7 @@ public class FileFrame {
 		comboBoxId.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					client.sendMessage("SEARCH_USER");
+					client.sendMessage("SEARCH_DOC");
 					client.sendMessage(comboBoxId.getSelectedItem().toString());
 					client.getMessage();
 					textFieldfilename.setText(client.message.poll());

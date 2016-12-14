@@ -229,13 +229,11 @@ public class UserFrame {
 				if(client.message.poll().equals("SUCCESS")){
 					comboBoxname.addItem(textFieldname.getText());
 					JOptionPane.showMessageDialog(null, "新增用户成功啦╮(‵▽′)╭", "成功提示", JOptionPane.INFORMATION_MESSAGE);
-					textFieldname.setText("");
-					passwordField.setText("");
 				} else {
 					JOptionPane.showMessageDialog(null, "用户新增失败哦╮(‵▽′)╭", "错误提示", JOptionPane.PLAIN_MESSAGE);
-					textFieldname.setText("");
-					passwordField.setText("");
 				}
+				textFieldname.setText("");
+				passwordField.setText("");
 			}
 		});
 		
