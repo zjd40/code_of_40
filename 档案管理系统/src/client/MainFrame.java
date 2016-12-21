@@ -50,7 +50,8 @@ public class MainFrame{
 		frame.getContentPane().setEnabled(false);
 		frame.setBounds(100, 100, 700, 450);
 		frame.setLocationRelativeTo(null);
-		frame.setTitle("²Ëµ¥");
+		frame.setResizable(false);
+		frame.setTitle(client.userName + "²Ëµ¥");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		menuBar = new JMenuBar();

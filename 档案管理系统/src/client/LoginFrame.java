@@ -103,6 +103,7 @@ public class LoginFrame {
 					if(client.message.poll().equals("SUCCESS")){
 						JOptionPane.showMessageDialog(null, "成功登录啦╮(‵▽′)╭", "成功提示", JOptionPane.INFORMATION_MESSAGE);
 						new MainFrame(client);
+						frame.dispose();
 					} else {
 						JOptionPane.showMessageDialog(null, "登录失败哦╮(‵▽′)╭", "错误提示", JOptionPane.PLAIN_MESSAGE);
 						textFieldname.setText("");

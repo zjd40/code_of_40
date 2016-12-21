@@ -23,14 +23,23 @@ public class Server extends ServerSocket {
 	
 	class ServerThread extends Thread{
 		private Socket client;
-		private BufferedReader bufferedReader;
-		private PrintWriter printWriter;
+		private ObjectOutputStream output;
+		private ObjectInputStream input;
 		private MessageOperation messageOperation;
+		
+		ObjectOutputStream getoutput(){
+			return this.output;
+		}
+		
+		ObjectInputStream getinput(){
+			return this.input;
+		}
 		
 		public ServerThread(Socket socket) throws IOException{
 			client = socket;
-			bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			printWriter = new PrintWriter(client.getOutputStream(), true);
+			output = new ObjectOutputStream( client.getOutputStream() );
+			output.flush();
+			input = new ObjectInputStream( client.getInputStream() );
 			messageOperation = new MessageOperation();
 			try {
 				displayMessage("Client(" + getName() +") ");
@@ -48,87 +57,85 @@ public class Server extends ServerSocket {
 				messageOperation.setServerThread(this);
 				do {
 					try {
-						message = bufferedReader.readLine();
+						message = (String)input.readObject();
 						displayMessage(message);
 					} catch ( ClassNotFoundException classNotFoundException )
 					{
 						displayMessage( "接收不明数据类型" );
 					}
 				} while (!message.equals("CLOSE"));
-				printWriter.close();
-				bufferedReader.close();
+				output.close();
+				input.close();
+				client.close();
 			} catch (IOException | ClassNotFoundException | NullPointerException e){
 				
 			}
 		}
 		
 		protected void sendMessage(String message) throws IOException{
-			printWriter.println(message);
-			printWriter.flush();
+			output.writeObject(message);
 		}
 		
 		protected void displayMessage(final String messageToDisplay) throws ClassNotFoundException, IOException{
 			String name, password, role;
-			String id, description, path;
+			String id, description;
 			String newpassword;
 			switch(messageToDisplay){
 				case "CONNECTION":
 					messageOperation.connection();
 					break;
 				case "LOGIN":
-					name = bufferedReader.readLine();
-					password = bufferedReader.readLine();
+					name = (String)input.readObject();
+					password = (String)input.readObject();
 					messageOperation.login(name, password);		
 					break;
 				case "GET_ALL_USER":
 					messageOperation.getalluser();
 					break;
 				case "SEARCH_USER":
-					name = bufferedReader.readLine();
+					name = (String)input.readObject();
 					messageOperation.searchuser(name);
 					break;
 				case "ADD_USER":
-					name = bufferedReader.readLine();
-					password = bufferedReader.readLine();
-					role = bufferedReader.readLine();
+					name = (String)input.readObject();
+					password = (String)input.readObject();
+					role = (String)input.readObject();
 					messageOperation.adduser(name, password, role);
 					break;
 				case "CHANGE_USER":
-					name = bufferedReader.readLine();
-					password = bufferedReader.readLine();
-					role = bufferedReader.readLine();
+					name = (String)input.readObject();
+					password = (String)input.readObject();
+					role = (String)input.readObject();
 					messageOperation.changeuser(name, password, role);	
 					break;
 				case "DELETE_USER":
-					name = bufferedReader.readLine();
+					name = (String)input.readObject();
 					messageOperation.deleteuser(name);	
 					break;
 				case "GET_ALL_DOC":
 					messageOperation.getalldoc();
 					break;
 				case "SEARCH_DOC":
-					id = bufferedReader.readLine();
+					id = (String)input.readObject();
 					messageOperation.searchdoc(id);
 					break;
 				case "DOWNLOAD_FILE":
-					id = bufferedReader.readLine();
-					path = bufferedReader.readLine();
-					messageOperation.downlodefile(id, path);
+					id = (String)input.readObject();
+					messageOperation.downlodefile(id);
 					break;
 				case "UPLOAD_FILE":	
-					id = bufferedReader.readLine();
-					description = bufferedReader.readLine();
-					path = bufferedReader.readLine();
-					messageOperation.uploadfile(id, description, path);	
+					id = (String)input.readObject();
+					description = (String)input.readObject();
+					messageOperation.uploadfile(id, description);	
 					break;
 				case "CHANGE_INFO":	
-					name = bufferedReader.readLine();
-					password = bufferedReader.readLine();
-					newpassword = bufferedReader.readLine();
+					name = (String)input.readObject();
+					password = (String)input.readObject();
+					newpassword = (String)input.readObject();
 					messageOperation.changeinfo(name, password, newpassword);	
 					break;
 				case "QUIT":
-					messageOperation.quit();		
+					messageOperation.quit();
 					break;
 				case "DISCONNECTION":
 					messageOperation.disconnection();
@@ -138,5 +145,5 @@ public class Server extends ServerSocket {
 					break;
 			}
 		}
-	}
+	}	
 }

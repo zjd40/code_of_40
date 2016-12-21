@@ -114,7 +114,7 @@ public class FileFrame {
 		panel.add(comboBoxId);
 		
 		textFieldfilename = new JTextField();
-		textFieldfilename.setFont(new Font("宋体", Font.BOLD, 15));
+		textFieldfilename.setFont(new Font("宋体", Font.BOLD, 10));
 		textFieldfilename.setEditable(false);
 		textFieldfilename.setBounds(280, 25, 140, 25);
 		panel.add(textFieldfilename);
@@ -249,7 +249,7 @@ public class FileFrame {
 						file=fileChooser.getSelectedFile();
 						client.sendMessage("DOWNLOAD_FILE");
 						client.sendMessage(String.valueOf(comboBoxId.getSelectedItem()));
-						client.sendMessage(file.getAbsolutePath());
+						client.downloadFile(file);
 						client.getMessage();
 						if (client.message.poll().equals("SUCCESS")){
 							JOptionPane.showMessageDialog(null, "下载文件成功啦╮(‵▽′)╭", "成功提示", JOptionPane.INFORMATION_MESSAGE);
@@ -292,7 +292,7 @@ public class FileFrame {
 						client.sendMessage("UPLOAD_FILE");
 						client.sendMessage(textFieldId.getText());
 						client.sendMessage(editorPaneDescription_1.getText());
-						client.sendMessage(file.getAbsolutePath());
+						client.uploadFile(textFieldId.getText(), editorPaneDescription_1.getText(), file);
 						client.getMessage();
 						if (client.message.poll().equals("SUCCESS")){
 							JOptionPane.showMessageDialog(null, "上传文件成功啦╮(‵▽′)╭", "成功提示", JOptionPane.INFORMATION_MESSAGE);

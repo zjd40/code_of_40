@@ -5,9 +5,10 @@ import java.io.*;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Enumeration;
+
 import server.Server.ServerThread;
 public class MessageOperation {
-	private DataProcessing dataProcessing;
+	protected DataProcessing dataProcessing;
 	private ServerThread serverThread;
 	private User myuser;
 	
@@ -20,16 +21,12 @@ public class MessageOperation {
 		this.serverThread = null;
 		myuser = null;
 	}
-	
-	public User getmyUser(){
-		return myuser;
-	}
 
-	public void setServerThread(ServerThread serverThread) {
+	void setServerThread(ServerThread serverThread) {
 		this.serverThread = serverThread;
 	}
 	
-	protected void connection(){
+	void connection(){
 		dataProcessing = new DataProcessing();
 		try {
 			dataProcessing.connectToDB(driverName, url, username, password);
@@ -38,7 +35,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void login(String name, String password) {
+	void login(String name, String password) {
 		try {
 			myuser = DataProcessing.searchUser(name, password);
 			if (myuser != null) {
@@ -55,7 +52,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void getalluser(){
+	void getalluser(){
 		try{
 			User user;
 			Enumeration<User> elem = DataProcessing.getAllUser();
@@ -75,7 +72,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void searchuser(String name){
+	void searchuser(String name){
 		User user;
 		try {
 			user = DataProcessing.searchUser(name);
@@ -93,7 +90,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void adduser(String name, String password, String role){
+	void adduser(String name, String password, String role){
 		try{
 			if (name.length() != 0 
 					&& password.length() != 0 
@@ -109,7 +106,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void changeuser(String name, String password, String role){
+	void changeuser(String name, String password, String role){
 		try{
 			 if (DataProcessing.updateUser(name, password, role)){
 				 serverThread.sendMessage("修改用户信息成功");
@@ -124,7 +121,7 @@ public class MessageOperation {
 		}
 	}	
 
-	protected void deleteuser(String name){
+	void deleteuser(String name){
 		try{
 			if (DataProcessing.deleteUser(String.valueOf(name))){
 				serverThread.sendMessage("删除用户成功");
@@ -140,7 +137,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void getalldoc(){
+	void getalldoc(){
 		try{
 			Doc doc;
 			Enumeration<Doc> elem = DataProcessing.getAllDocs();
@@ -150,7 +147,7 @@ public class MessageOperation {
 			serverThread.sendMessage(doc.getCreator());
 			serverThread.sendMessage(String.valueOf(doc.getTimestamp()));
 			if (doc.getDescription() == null){
-				serverThread.sendMessage("null");
+				serverThread.sendMessage("NULL");
 			} else {
 				serverThread.sendMessage(doc.getDescription());
 			}
@@ -166,7 +163,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void searchdoc(String id){
+	void searchdoc(String id){
 		Doc doc;
 		try {
 			doc = DataProcessing.searchDoc(id);
@@ -175,7 +172,11 @@ public class MessageOperation {
 				serverThread.sendMessage(doc.getFilename());
 				serverThread.sendMessage(doc.getCreator());
 				serverThread.sendMessage(String.valueOf(doc.getTimestamp()));
-				serverThread.sendMessage(doc.getDescription());
+				if (doc.getDescription() == null){
+					serverThread.sendMessage("NULL");
+				} else {
+					serverThread.sendMessage(doc.getDescription());
+				}
 				serverThread.sendMessage("SUCCESS");
 			} else {
 				serverThread.sendMessage("检索档案失败");
@@ -186,47 +187,81 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void downlodefile(String id, String path){
-		File file = new File(path);
-		try {
-			if (file.getAbsolutePath() != null){
-				myuser.downloadFile(id, file);
-				serverThread.sendMessage("下载文件成功");
-				serverThread.sendMessage("SUCCESS");
-			} else {
+	void downlodefile(String id){
+		FileInputStream fis = null;
+		Doc doc = null;	
+		try {	
+			doc = DataProcessing.searchDoc(id);
+			if(doc == null){
 				serverThread.sendMessage("下载文件失败");
 				serverThread.sendMessage("FAIL");
-			}
-		} catch (SQLException | IOException | ClassNotFoundException error) {
-			error.printStackTrace();
-		}
-	}
-
-	protected void uploadfile(String id, String description, String path){
-		try {
-			File file = new File(path);
-			if (file.getAbsolutePath() != null){
-				if (id.length() != 0 
-						&& description.length() != 0 
-						&& myuser.uploadFile(id, description, file.getAbsolutePath())){
-					DataProcessing.insertDoc(id, 
-							myuser.getName(), 
-							new Timestamp(System.currentTimeMillis()), 
-							description, 
-							file.getName());
-					serverThread.sendMessage("上传文件成功");
-					serverThread.sendMessage("SUCCESS");
-				} else {
-					serverThread.sendMessage("上传文件失败");
-					serverThread.sendMessage("FAIL");
+			} else {
+				File file = new File(Doc.FileDatabasePath + doc.getFilename());
+				fis = new FileInputStream(file);
+				Long length = 0L, sum = 0L;
+				int i = 0;
+				length = file.length();
+				serverThread.getoutput().writeLong(length);
+				serverThread.getoutput().flush();
+				byte[] buf = new byte[1024];
+				while((i = fis.read(buf)) > 0){
+					serverThread.getoutput().write(buf, 0, i);
+					serverThread.getoutput().flush();
+					sum+=i;	
+					System.out.println("已传输：" + (100 * sum / length) + "%");
+				}
+				if (serverThread.getinput().readObject().toString().equals("接收完毕")){
+					serverThread.sendMessage("下载文件成功");
+					serverThread.sendMessage("SUCCESS");	
 				}
 			}
-		} catch (SQLException | IOException | HeadlessException | ClassNotFoundException e1) {
-			e1.printStackTrace();
+			if(fis!=null)
+				fis.close();
+		} catch (ClassNotFoundException | SQLException | IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	protected void changeinfo(String name, String oldpassword, String newpassword){
+	void uploadfile(String id, String description){
+		try{
+			Doc doc = null;
+			File file;
+			doc = DataProcessing.searchDoc(id);
+			if (doc != null){
+				serverThread.sendMessage("上传文件失败");
+				serverThread.sendMessage("SUCCESS");
+				return;
+			}
+			String filename = serverThread.getinput().readUTF();
+			file = new File(Doc.FileDatabasePath + filename);
+			FileOutputStream fos = new FileOutputStream(file);
+			Long length, sum = 0L;
+			length = serverThread.getinput().readLong();
+			int i;
+			byte[] buf = new byte[1024];
+			while(true){					
+				i = serverThread.getinput().read(buf);
+				fos.write(buf, 0, i);
+				fos.flush();
+				sum += i;		
+				System.out.println("已传输：" + (100 * sum / length) + "%");
+				if(sum >= length){
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					DataProcessing.insertDoc(id, myuser.getName(), timestamp, description, filename);
+					break;
+				}
+			}
+			if(fos != null){
+				fos.close();
+			}
+			serverThread.sendMessage("上传文件成功");
+			serverThread.sendMessage("SUCCESS");
+		} catch(SQLException | IOException | HeadlessException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	void changeinfo(String name, String oldpassword, String newpassword){
 		try {
 			User user = DataProcessing.searchUser(name, oldpassword);
 			if (user != null){
@@ -247,7 +282,7 @@ public class MessageOperation {
 		}
 	}
 	
-	protected void quit(){
+	void quit(){
 		try {
 			serverThread.sendMessage("QUIT");
 			serverThread.sendMessage("NONE");
@@ -256,7 +291,7 @@ public class MessageOperation {
 		}
 	}
  	
- 	protected void disconnection(){
+ 	void disconnection(){
  		dataProcessing.disconnectFromDB();
  	}
 }

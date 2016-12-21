@@ -11,13 +11,13 @@ public class DataProcessing{
 	private static ResultSet resultSet;
 	private static boolean connectedToDatabase = false;
 	
-	protected void connectToDB(String driverName, String url, String username, String password) throws ClassNotFoundException, SQLException{
+	void connectToDB(String driverName, String url, String username, String password) throws ClassNotFoundException, SQLException{
 		Class.forName(driverName);											
 		connection = DriverManager.getConnection(url, username, password);	
 		connectedToDatabase = true;
 	}
 	
-	protected void disconnectFromDB(){
+	void disconnectFromDB(){
 		if (!connectedToDatabase)
 		try {
 			resultSet.close();
@@ -30,7 +30,7 @@ public class DataProcessing{
 		}
 	}
 	
-	protected static Enumeration<User> getAllUser() throws SQLException, ClassNotFoundException{
+	static Enumeration<User> getAllUser() throws SQLException, ClassNotFoundException{
 		Vector<User> v = new Vector<User>();
 		Enumeration<User> e = null;
 		if (!connectedToDatabase){
@@ -50,7 +50,7 @@ public class DataProcessing{
 		return e;
 	}
 	
-	protected static Enumeration<Doc> getAllDocs() throws SQLException, ClassNotFoundException{
+	static Enumeration<Doc> getAllDocs() throws SQLException, ClassNotFoundException{
 		Vector<Doc> v = new Vector<Doc>();
 		Enumeration<Doc> e = null;
 		if (!connectedToDatabase){
@@ -72,7 +72,7 @@ public class DataProcessing{
 		return e;
 	}
 	
-	protected static User searchUser(String name) throws SQLException, ClassNotFoundException{
+	static User searchUser(String name) throws SQLException, ClassNotFoundException{
 		User temp = null;
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
@@ -90,7 +90,7 @@ public class DataProcessing{
 		preparedStatement.close();
 		return temp;
 	}
-	protected static User searchUser(String name, String password) throws SQLException, ClassNotFoundException{
+	static User searchUser(String name, String password) throws SQLException, ClassNotFoundException{
 		User temp = null;
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
@@ -108,7 +108,7 @@ public class DataProcessing{
 		return temp;
 	}
 	
-	protected static Doc searchDoc(String ID) throws SQLException, ClassNotFoundException{
+	static Doc searchDoc(String ID) throws SQLException, ClassNotFoundException{
 		Doc temp = null;
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
@@ -129,7 +129,7 @@ public class DataProcessing{
 		return temp;
 	}
 	
-	protected static boolean insertUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
+	static boolean insertUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}	
@@ -151,7 +151,7 @@ public class DataProcessing{
 		}
 	}
 	
-	protected static boolean insertDoc(String ID, String creator, Timestamp timestamp, String description, String filename) throws SQLException, ClassNotFoundException{
+	static boolean insertDoc(String ID, String creator, Timestamp timestamp, String description, String filename) throws SQLException, ClassNotFoundException{
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}
@@ -172,7 +172,7 @@ public class DataProcessing{
 		}
 	}
 	
-	protected static boolean updateUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
+	static boolean updateUser(String name, String password, String role) throws SQLException, ClassNotFoundException{
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}
@@ -190,7 +190,7 @@ public class DataProcessing{
 			return false;
 	}
 	
-	protected static boolean deleteUser(String name) throws SQLException, ClassNotFoundException{
+	static boolean deleteUser(String name) throws SQLException, ClassNotFoundException{
 		if (!connectedToDatabase){
 			throw new SQLException("disconnect to the Database!");
 		}	
@@ -206,7 +206,7 @@ public class DataProcessing{
 			return false;
 	}	
 	
-	protected static boolean getConnectedToDatabase(){
+	static boolean getConnectedToDatabase(){
 		return connectedToDatabase;
 	}
 }

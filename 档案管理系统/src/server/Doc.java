@@ -9,25 +9,27 @@ public class Doc{
 	private String description;
 	private String filename;
 	
+	protected static String FileDatabasePath = "e:\\OPP\\ServerFileDatabase\\";
+	
 	public Doc(String ID, String creator, Timestamp timestamp, String description, String filename) {
 		super();
 		this.ID = ID;
 		this.creator = creator;
 		this.timestamp = timestamp;
 		this.description = description;
-		this.filename=filename;
+		this.filename = filename;
 	}
 
 	public String getID() {
-		return ID;
+		return this.ID;
 	}
 
-	public void setID(String iD) {
-		ID = iD;
+	public void setID(String ID) {
+		this.ID = ID;
 	}
 
 	public String getCreator() {
-		return creator;
+		return this.creator;
 	}
 
 	public void setCreator(String creator) {
@@ -35,7 +37,7 @@ public class Doc{
 	}
 
 	public Timestamp getTimestamp() {
-		return timestamp;
+		return this.timestamp;
 	}
 
 	public void setTimestamp(Timestamp timestamp) {
@@ -43,7 +45,7 @@ public class Doc{
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(String description) {
@@ -51,7 +53,7 @@ public class Doc{
 	}
 
 	public String getFilename() {
-		return filename;
+		return this.filename;
 	}
 
 	public void setFilename(String filename) {
