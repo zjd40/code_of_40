@@ -1,0 +1,6 @@
+﻿  myHashuTable.cpp
+c:\users\administrator\documents\visual studio 2015\projects\myhashtable\myhashtable\myhashutable.cpp(18): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\visual studio 2015\projects\myhashtable\myhashtable\myhashutable.cpp(66): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\administrator\documents\visual studio 2015\projects\myhashtable\myhashtable\myhashutable.cpp(68): warning C4018: “<”: 有符号/无符号不匹配
+  myHashTable.vcxproj -> C:\Users\Administrator\Documents\Visual Studio 2015\Projects\myHashTable\Debug\myHashTable.exe
+  myHashTable.vcxproj -> C:\Users\Administrator\Documents\Visual Studio 2015\Projects\myHashTable\Debug\myHashTable.pdb (Full PDB)
